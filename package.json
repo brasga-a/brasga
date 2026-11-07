@@ -1,0 +1,45 @@
+{
+  "name": "portfolio",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "tools/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "ready": "vp run check && vp run test && vp run build",
+    "dev": "vp run --parallel --filter web --filter api dev",
+    "prepare": "vp config",
+    "setup": "vp install && uv sync --all-packages && vp run web#types",
+    "dev:web": "vp run web#dev",
+    "dev:api": "vp run api#dev",
+    "check": "vp run web#check && vp check && vp run api#check",
+    "test": "vp run -r test",
+    "build": "vp run -r build",
+    "deploy": "vp run web#deploy",
+    "deploy:check": "vp run web#deploy:check"
+  },
+  "devDependencies": {
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "overrides": {
+    "vite": "catalog:"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "bun",
+      "version": "1.4.4",
+      "onFail": "download"
+    }
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "catalog": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@1.4.0",
+    "vite-plus": "1.4.0"
+  }
+}

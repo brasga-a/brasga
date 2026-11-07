@@ -1,0 +1,12 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "uv run --package portfolio-api uvicorn portfolio_api.main:app --reload --reload-dir src --host 127.0.0.1 --port 8000",
+    "start": "uv run --package portfolio-api --no-dev uvicorn portfolio_api.main:app --host 0.0.0.0 --port 8000",
+    "check": "uv run --package portfolio-api ruff check . && uv run --package portfolio-api ruff format --check .",
+    "test": "uv run --package portfolio-api pytest",
+    "build": "uv build --package portfolio-api --out-dir dist"
+  }
+}
