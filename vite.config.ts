@@ -4,7 +4,7 @@ export default defineConfig({
   staged: {
     "*": "vp check --fix",
   },
-  fmt: { ignorePatterns: ["**/routeTree.gen.ts", "**/.cloudflare/**"] },
+  fmt: { ignorePatterns: ["**/routeTree.gen.ts", "**/pylock.toml", "**/.cloudflare/**"] },
   lint: {
     ignorePatterns: ["**/routeTree.gen.ts", "**/.cloudflare/**"],
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],

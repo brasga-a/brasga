@@ -2,11 +2,21 @@
   "name": "api",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "uv run --package portfolio-api uvicorn portfolio_api.main:app --reload --reload-dir src --host 127.0.0.1 --port 8000",
-    "start": "uv run --package portfolio-api --no-dev uvicorn portfolio_api.main:app --host 0.0.0.0 --port 8000",
+    "dev": "uv run --package portfolio-api --extra server uvicorn portfolio_api.main:app --reload --reload-dir src --host 127.0.0.1 --port 8000",
+    "start": "uv run --package portfolio-api --extra server --no-dev uvicorn portfolio_api.main:app --host 0.0.0.0 --port 8000",
     "check": "uv run --package portfolio-api ruff check . && uv run --package portfolio-api ruff format --check .",
     "test": "uv run --package portfolio-api pytest",
-    "build": "uv build --package portfolio-api --out-dir dist"
+    "build": "uv build --package portfolio-api --out-dir dist",
+    "dev:cloudflare": "cf dev",
+    "build:cloudflare": "cf build",
+    "deploy": "cf deploy",
+    "deploy:check": "cf deploy --dry-run"
+  },
+  "devDependencies": {
+    "cf": "^1.0.0-beta.28",
+    "jsonc-parser": "^3.3.1",
+    "wrangler": "^4.158.0"
   }
 }

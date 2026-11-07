@@ -3,10 +3,20 @@ name = "portfolio-api"
 version = "0.1.0"
 description = "API do portfolio em FastAPI"
 requires-python = ">=3.11"
-dependencies = ["fastapi>=0.115,<1", "uvicorn[standard]>=0.30,<1"]
+dependencies = ["fastapi>=0.115,<1"]
+
+[project.optional-dependencies]
+server = ["uvicorn[standard]>=0.30,<1"]
 
 [dependency-groups]
-dev = ["httpx>=0.27,<1", "pytest>=8,<10", "ruff>=0.14,<1"]
+dev = [
+  "httpx>=0.27,<1",
+  "pytest>=8,<10",
+  "ruff>=0.14,<1",
+  "uv>=0.13.4,<0.14",
+  "workers-py>=1.17.9,<2",
+  "workers-runtime-sdk>=1.9.6",
+]
 
 [build-system]
 requires = ["uv_build>=0.13.0,<0.14.0"]

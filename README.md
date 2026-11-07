@@ -1,4 +1,4 @@
-# Portfolio
+# brasga.com
 
 Monorepo com Vite+ no frontend e FastAPI no backend.
 
@@ -111,33 +111,63 @@ Para validar o deploy sem publicar:
 vp run deploy:check
 ```
 
-Para publicar o Worker `portfolio-web`, autentique o CLI e informe a origem
-HTTPS onde a API FastAPI está hospedada:
+Para publicar o Worker `portfolio-web` em `brasga.com`, autentique o CLI:
 
 ```bash
 cf auth login
-API_ORIGIN=https://sua-api.example.com vp run deploy
+vp run deploy
 ```
 
 Em CI, use `CLOUDFLARE_API_TOKEN` e `CLOUDFLARE_ACCOUNT_ID` no ambiente. O script
 faz o build e publica o resultado com `cf deploy --prebuilt --mode production`.
-`API_ORIGIN` é lida do ambiente no build e gravada como binding de texto do
-Worker. O arquivo `.env.example` documenta o valor; exporte a variável no shell
-ou configure-a no ambiente de build. Não use o endereço de exemplo no deploy.
+`API_ORIGIN` usa `https://api.brasga.com` em produção e pode ser sobrescrita
+pelo ambiente no build. O valor é gravado como binding de texto do Worker.
+O arquivo `.env.example` documenta a configuração opcional.
 
 O Worker encaminha `/api/*` à origem configurada, preservando método, corpo,
-caminho e query. Sem `API_ORIGIN` em produção, essas chamadas retornam JSON
-com status 503. Em desenvolvimento, a origem padrão é `http://127.0.0.1:8000`.
+caminho e query. Se `API_ORIGIN` for explicitamente definida como vazia, essas chamadas retornam
+JSON com status 503. Em desenvolvimento, a origem é `http://127.0.0.1:8000`.
 A origem da API deve apontar para o backend, não para o próprio web.
 
-A configuração Cloudflare deste projeto cobre o **web**. A API continua como
-serviço Python/Uvicorn e precisa estar acessível na origem informada. Para
-executar FastAPI dentro da Cloudflare, é necessária uma adaptação adicional
-para Python Workers ou Containers.
+## API na Cloudflare
 
-## API em produção
+A API FastAPI roda em Python Workers no Worker `portfolio-api`, com domínio
+`api.brasga.com`. O adaptador ASGI fica em `apps/api/src/worker.py`; a aplicação
+continua em `src/portfolio_api/main.py`, compartilhada com Uvicorn e os testes.
 
-Os pacotes Python ficam em `apps/api/dist`. Para iniciar a API sem reload:
+```bash
+vp run dev:api:cloudflare  # Runtime Python Workers local na porta 8000
+vp run deploy:api:check   # Build e dry-run sem publicar
+vp run deploy:api         # Publica a API em api.brasga.com
+```
+
+A publicação usa o CLI `cf`. A API declara Wrangler como implementação de build,
+com `wrangler.config.ts` executando `pywrangler sync` antes do build para preparar
+as dependências compatíveis com Pyodide. `cloudflare.config.ts` define o Worker,
+o domínio, logs e traces. O arquivo `wrangler.jsonc` contém apenas os metadados
+de compatibilidade exigidos por `pywrangler sync`, e a configuração cf lê esse
+mesmo arquivo para manter uma única definição da versão do runtime.
+
+Versione `apps/api/pylock.toml`: ele fixa as dependências do runtime Pyodide;
+`uv.lock` fixa as dependências locais. `python_modules/`, `.venv-workers/` e
+`.cloudflare/` são gerados e ignorados pelo Git. A versão de Python Workers é
+selecionada pela data de compatibilidade; ela é independente do Python local
+fixado em `.python-version`. O uv necessário ao `workers-py` está declarado
+nas dependências de desenvolvimento para não exigir atualização global.
+
+Endpoints públicos após o deploy:
+
+- https://api.brasga.com/api/health
+- https://api.brasga.com/docs
+- https://api.brasga.com/openapi.json
+
+Para publicar os dois serviços, execute `vp run deploy:api` e depois
+`vp run deploy`. O cf configura os Custom Domains e os registros DNS ao publicar.
+
+## API com Uvicorn
+
+Os pacotes Python ficam em `apps/api/dist`. Para executar fora da Cloudflare,
+o extra `server` instala Uvicorn sem incluí-lo nas dependências do Worker:
 
 ```bash
 vp run api#start
@@ -153,3 +183,5 @@ Referências: [workspace uv](https://docs.astral.sh/uv/concepts/projects/workspa
 Referências do frontend e deploy: [TanStack Router](https://tanstack.com/router/latest/docs/framework/react/installation/with-vite),
 [Tailwind com Vite](https://tailwindcss.com/docs/installation/using-vite) e
 [desenvolver e publicar com cf](https://developers.cloudflare.com/cf/projects/).
+
+Referência da API: [FastAPI em Python Workers](https://developers.cloudflare.com/workers/languages/python/packages/fastapi/).

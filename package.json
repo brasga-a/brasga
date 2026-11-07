@@ -19,7 +19,10 @@
     "test": "vp run -r test",
     "build": "vp run -r build",
     "deploy": "vp run web#deploy",
-    "deploy:check": "vp run web#deploy:check"
+    "deploy:check": "vp run web#deploy:check",
+    "deploy:api": "vp run api#deploy",
+    "deploy:api:check": "vp run api#deploy:check",
+    "dev:api:cloudflare": "vp run api#dev:cloudflare"
   },
   "devDependencies": {
     "vite": "catalog:",

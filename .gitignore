@@ -72,3 +72,8 @@ junit.xml
 .wrangler/
 .dev.vars
 .dev.vars.*
+
+# Python Workers vendored dependencies and local runtimes
+python_modules/
+.venv-workers/
+.venv-pyodide/
